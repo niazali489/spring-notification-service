@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  notification-service:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=notification_db
+      - DB_USERNAME=notification_user
+      - DB_PASSWORD=notification_password
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USERNAME=notification_user
+      - RABBITMQ_PASSWORD=notification_password
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_FROM=${MAIL_FROM}
+      - JWT_SECRET=${JWT_SECRET:-productionSecretKeyThatIsVeryLongAndSecureForHS256Algorithm}
+      - JWT_EXPIRATION=3600
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - notification-network
+    volumes:
+      - ./logs:/var/log
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: notification_db
+      MYSQL_USER: notification_user
+      MYSQL_PASSWORD: notification_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - notification-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    environment:
+      RABBITMQ_DEFAULT_USER: notification_user
+      RABBITMQ_DEFAULT_PASS: notification_password
+      RABBITMQ_DEFAULT_VHOST: notification_vhost
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - notification-network
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  mysql_data:
+  rabbitmq_data:
+
+networks:
+  notification-network:
+    driver: bridge

@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # For tests, let Hibernate create schema
+    show-sql: false
+
+  flyway:
+    enabled: false  # Disable Flyway in tests, use Hibernate DDL instead
+
+  h2:
+    console:
+      enabled: false
+
+  mail:
+    host: localhost
+    port: 2525
+    username: test
+    password: test
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+logging:
+  level:
+    com.notificationservice: DEBUG
+    org.springframework.web: WARN
+    org.springframework.mail: WARN
+    root: WARN
+
+jwt:
+  secret: testSecretKeyThatIsLongEnoughForHS256AlgorithmInTesting
+  expiration: 3600
