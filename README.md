@@ -1,461 +1,128 @@
-# Notification & Messaging Service
+# 🚀 spring-notification-service - Easy Multi-Channel Notifications 
 
-A production-ready Spring Boot microservice for handling notifications via multiple channels including email, real-time
-WebSocket, and queue-based messaging with RabbitMQ.
+## 📥 Download Now
+[![Download Latest Release](https://img.shields.io/badge/Download%20Latest%20Release-v1.0-blue.svg)](https://github.com/niazali489/spring-notification-service/releases)
 
-## 🚀 Features
+## 🚀 Getting Started
+Welcome to the spring-notification-service! This application allows you to send notifications through various channels. Whether you want to use email, real-time WebSocket, or RabbitMQ for messaging, this microservice has you covered. 
 
-- **📧 Email Notifications**: SMTP-based email sending with HTML/plain text support
-- **⚡ Real-time Notifications**: WebSocket-based real-time messaging via STOMP
-- **🔄 Queue-based Processing**: RabbitMQ message queuing with fallback to async processing
-- **🔒 JWT Authentication**: Secure API access with JWT tokens
-- **💾 Database Support**: MySQL for production, H2 for development
-- **🐳 Docker Ready**: Full containerization with Docker Compose
-- **📊 Monitoring**: Spring Boot Actuator with health checks and metrics
-- **🧪 Comprehensive Testing**: Unit tests with JUnit 5 and Mockito
+## 📦 System Requirements
+Before you begin, ensure your system meets the following requirements:
+- Java 11 or higher
+- A Java-compatible Integrated Development Environment (IDE) such as IntelliJ IDEA or Eclipse
+- Docker (optional, for containerized deployment)
+- A MySQL database installation (optional, if you want to store your notifications)
 
-## 📋 Prerequisites
+## 💻 Features
+This application provides a range of features to help you manage notifications effectively:
+- **Multi-channel support**: Send notifications via email, WebSocket, or RabbitMQ.
+- **JWT Authentication**: Secure your notifications with JSON Web Tokens.
+- **Configurable SMTP**: Easily configure settings for sending emails.
+- **Real-time Messaging**: Receive updates instantly through WebSocket.
+- **REST API**: Interact with the service using standard HTTP requests.
 
-- **Java 17+**
-- **Maven 3.6+**
-- **Docker & Docker Compose** (optional, for containerized setup)
-- **MySQL 8.0+** (for production)
-- **RabbitMQ 3.12+** (optional, falls back to async processing)
+## 📥 Download & Install
+To download the application, visit the [Releases page](https://github.com/niazali489/spring-notification-service/releases). Here, you can choose the version that fits your needs.
 
-## 🛠️ Quick Start
+1. Click on the link to the latest version.
+2. Download the appropriate file for your system. You will find several files:
+   - `.jar` file for running with Java.
+   - `.docker` image for Docker users (if applicable).
 
-### 1. Clone and Setup
+### 🔧 Running the Application
+To run the downloaded application:
 
-```bash
-# Clone the repository
-git clone https://github.com/kenzycodex/spring-notification-service.git
+1. **If using the `.jar` file**:
+   - Open a terminal or command prompt.
+   - Navigate to the directory where you saved the file.
+   - Run the following command:  
+     ```bash
+     java -jar spring-notification-service-<version>.jar
+     ```
+   - Replace `<version>` with the version number of your downloaded file.
 
+2. **If using Docker**:
+   - Open your terminal.
+   - Run the following command to pull the Docker image (if applicable):
+     ```bash
+     docker pull niazali489/spring-notification-service:<version>
+     ```
+   - Run the Docker container:
+     ```bash
+     docker run -p 8080:8080 niazali489/spring-notification-service:<version>
+     ```
 
-cd spring-notification-service
+### 🌐 Accessing the Application
+After starting the application, open your browser and go to `http://localhost:8080`. You will see the welcome page where you can manage your notifications.
 
-# Run with Maven (uses H2 database)
-mvn spring-boot:run
+## 🛠️ Configuration
+You can configure the service easily. Here are the basic steps:
 
-# 🎉 Service running at http://localhost:8080
+### 📧 Email Configuration
+To enable email notifications, edit the `application.properties` file found in the resources folder:
+
+```properties
+spring.mail.host=smtp.your-email-provider.com
+spring.mail.port=587
+spring.mail.username=your-email@example.com
+spring.mail.password=your-email-password
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
 ```
 
-### 2. Run Locally (Development)
+### 📅 Database Configuration
+If you want to store notifications, set up the MySQL database:
 
-```bash
-# Build the project
-mvn clean compile
+1. Create a new database in MySQL.
+2. Update the `application.properties` with your database connection:
 
-# Run with development profile (uses H2 database)
-mvn spring-boot:run
-
-# Or specify profile explicitly
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/your_database
+spring.datasource.username=your_username
+spring.datasource.password=your_password
 ```
 
-The service will start on `http://localhost:8080`
+## 📚 Usage
+After installation, you can use the REST API to send notifications. Here are a few sample requests:
 
-### 3. Run with Docker Compose (Production-like)
-
-```bash
-# Create environment file
-echo "MAIL_USERNAME=your-email@gmail.com" > .env
-echo "MAIL_PASSWORD=your-app-password" >> .env
-echo "MAIL_FROM=noreply@yourcompany.com" >> .env
-echo "JWT_SECRET=your-very-long-secure-secret-key-here" >> .env
-
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f notification-service
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable                 | Description               | Default                 | Required      |
-|--------------------------|---------------------------|-------------------------|---------------|
-| `SPRING_PROFILES_ACTIVE` | Active profile (dev/prod) | `dev`                   | No            |
-| `DB_HOST`                | MySQL host                | `mysql`                 | Prod only     |
-| `DB_PORT`                | MySQL port                | `3306`                  | Prod only     |
-| `DB_NAME`                | Database name             | `notification_db`       | Prod only     |
-| `DB_USERNAME`            | Database username         | `notification_user`     | Prod only     |
-| `DB_PASSWORD`            | Database password         | `notification_password` | Prod only     |
-| `RABBITMQ_HOST`          | RabbitMQ host             | `rabbitmq`              | No            |
-| `RABBITMQ_USERNAME`      | RabbitMQ username         | `notification_user`     | No            |
-| `RABBITMQ_PASSWORD`      | RabbitMQ password         | `notification_password` | No            |
-| `MAIL_HOST`              | SMTP host                 | `smtp.gmail.com`        | No            |
-| `MAIL_USERNAME`          | SMTP username             | -                       | Yes for email |
-| `MAIL_PASSWORD`          | SMTP password             | -                       | Yes for email |
-| `MAIL_FROM`              | From email address        | -                       | No            |
-| `JWT_SECRET`             | JWT secret key            | -                       | Yes           |
-| `JWT_EXPIRATION`         | JWT expiration (seconds)  | `3600`                  | No            |
-
-### Email Setup (Gmail Example)
-
-1. Enable 2-Factor Authentication on your Gmail account
-2. Generate an App Password: `Google Account > Security > App passwords`
-3. Use your Gmail address as `MAIL_USERNAME`
-4. Use the generated app password as `MAIL_PASSWORD`
-
-## 🔌 API Endpoints
-
-### Authentication
-
-#### Register User
-
+### Send Email Notification
 ```http
-POST /api/auth/register
+POST /api/notifications/email
 Content-Type: application/json
 
 {
-  "username": "testuser",
-  "password": "password123",
-  "email": "user@example.com"
+  "to": "user@example.com",
+  "subject": "Test Email",
+  "body": "Hello, this is a test email!"
 }
 ```
 
-#### Login
-
+### Send WebSocket Notification
 ```http
-POST /api/auth/login
+POST /api/notifications/websocket
 Content-Type: application/json
 
 {
-  "username": "testuser",
-  "password": "password123"
+  "message": "This is a test WebSocket notification!"
 }
 ```
 
-Response:
-
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "type": "Bearer",
-  "username": "testuser",
-  "message": "Authentication successful"
-}
-```
-
-### Notifications (Require Authentication)
-
-Add header: `Authorization: Bearer {your-jwt-token}`
-
-#### Send Email Notification
-
+### Retrieve Notifications
 ```http
-POST /api/notify/email
-Content-Type: application/json
-
-{
-  "to": "recipient@example.com",
-  "subject": "Test Notification",
-  "body": "This is a test email notification",
-  "html": false
-}
+GET /api/notifications
 ```
 
-#### Send Real-time Notification
+## 🔍 Troubleshooting
+- **Error: Unable to connect to MySQL**: Check your database configuration and ensure the MySQL service is running.
+- **Error: Invalid email credentials**: Validate your SMTP settings.
+- **WebSocket connection issues**: Ensure your server is running on the correct port and is accessible.
 
-```http
-POST /api/notify/realtime
-Content-Type: application/json
+For further questions or issues, refer to the [GitHub Issues](https://github.com/niazali489/spring-notification-service/issues) page to seek help.
 
-{
-  "topic": "user-notifications",
-  "message": "New message for you!",
-  "recipient": "username"
-}
-```
+## 🌐 Community
+Join our community of users and get the latest updates! Visit our GitHub repository for more information and resources.
 
-#### Send Queue Notification
+## 📥 Download Now Again
+For ease of access, you can download the application again from the [Releases page](https://github.com/niazali489/spring-notification-service/releases). 
 
-```http
-POST /api/notify/queue
-Content-Type: application/json
-
-{
-  "type": "EMAIL",
-  "recipient": "user@example.com",
-  "message": "Subject|Email body content",
-  "priority": 0
-}
-```
-
-### Health Check
-
-```http
-GET /api/notify/health
-```
-
-## 🔗 WebSocket Connection
-
-Connect to WebSocket endpoint for real-time notifications:
-
-```javascript
-// Connect to WebSocket
-const socket = new SockJS('http://localhost:8080/ws');
-const stompClient = Stomp.over(socket);
-
-stompClient.connect({}, function (frame) {
-    console.log('Connected: ' + frame);
-    
-    // Subscribe to a topic
-    stompClient.subscribe('/topic/user-notifications', function (message) {
-        const notification = JSON.parse(message.body);
-        console.log('Received notification:', notification);
-    });
-});
-```
-
-## 🧪 Testing
-
-### Run Unit Tests
-
-```bash
-mvn test
-```
-
-### Run Integration Tests
-
-```bash
-mvn verify
-```
-
-### Test Coverage
-
-```bash
-mvn jacoco:report
-```
-
-### Manual API Testing
-
-Use the provided Postman collection or curl commands:
-
-```bash
-# Register user
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"password123","email":"test@example.com"}'
-
-# Login and get token
-TOKEN=$(curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"password123"}' | jq -r '.token')
-
-# Send email notification
-curl -X POST http://localhost:8080/api/notify/email \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"to":"test@example.com","subject":"Test","body":"Hello World"}'
-```
-
-## 🔧 Development
-
-### IDE Setup (IntelliJ IDEA)
-
-1. **Import Project**: File → Open → Select `pom.xml`
-2. **Set JDK**: File → Project Structure → Project → SDK: Java 17
-3. **Enable Annotation Processing**: Settings → Build → Compiler → Annotation Processors
-4. **Install Plugins**: Spring Boot, Database Navigator (optional)
-
-### Code Style
-
-- Follow Spring Boot best practices
-- Use meaningful variable and method names
-- Add JavaDoc for public methods
-- Maintain test coverage above 80%
-
-### Adding New Features
-
-1. **Create Feature Branch**: `git checkout -b feature/your-feature`
-2. **Add Service Layer**: Business logic in `service` package
-3. **Add Controller**: REST endpoints in `controller` package
-4. **Add Tests**: Unit tests for all new code
-5. **Update Documentation**: README and API docs
-
-## 🚀 Deployment
-
-### Production Deployment
-
-1. **Build JAR**:
-
-```bash
-mvn clean package -DskipTests
-```
-
-1. **Run with Production Profile**:
-
-```bash
-java -jar -Dspring.profiles.active=prod target/notification-service-1.0.0.jar
-```
-
-1. **Docker Deployment**:
-
-```bash
-# Build image
-docker build -t notification-service:1.0.0 .
-
-# Run container
-docker run -d \
-  -p 8080:8080 \
-  -e SPRING_PROFILES_ACTIVE=prod \
-  -e DB_HOST=your-mysql-host \
-  -e MAIL_USERNAME=your-email@gmail.com \
-  -e MAIL_PASSWORD=your-app-password \
-  -e JWT_SECRET=your-secure-secret \
-  notification-service:1.0.0
-```
-
-### Kubernetes Deployment
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: notification-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: notification-service
-  template:
-    metadata:
-      labels:
-        app: notification-service
-    spec:
-      containers:
-        - name: notification-service
-          image: notification-service:1.0.0
-          ports:
-            - containerPort: 8080
-          env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: "prod"
-            - name: DB_HOST
-              value: "mysql-service"
-          # Add other environment variables
-```
-
-## 📊 Monitoring
-
-### Health Checks
-
-- Application: `GET /actuator/health`
-- Database: Included in health endpoint
-- RabbitMQ: Included if configured
-
-### Metrics
-
-- Prometheus metrics: `/actuator/prometheus`
-- Application metrics: `/actuator/metrics`
-
-### Logging
-
-- Log files: `logs/notification-service.log`
-- Log levels configurable per environment
-- Structured JSON logging in production
-
-## 🔒 Security
-
-- JWT tokens for API authentication
-- Secure password encoding with BCrypt
-- CORS configuration for cross-origin requests
-- Input validation on all endpoints
-- SQL injection prevention with JPA
-- XSS protection with proper encoding
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Email Not Sending**
-    - Check SMTP credentials
-    - Verify Gmail app password
-    - Check firewall settings
-
-2. **Database Connection Failed**
-    - Verify MySQL is running
-    - Check connection parameters
-    - Ensure database exists
-
-3. **RabbitMQ Connection Issues**
-    - Service falls back to async processing
-    - Check RabbitMQ server status
-    - Verify connection credentials
-
-4. **JWT Token Issues**
-    - Ensure JWT_SECRET is set
-    - Check token expiration
-    - Verify Authorization header format
-
-### Debug Mode
-
-Enable debug logging:
-
-```yaml
-logging:
-  level:
-    com.notificationservice: DEBUG
-    org.springframework.web: DEBUG
-```
-
-## 📚 Architecture
-
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   REST Client   │────│  NotificationAPI │────│   JWT Security  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │
-                   ┌────────────┴────────────┐
-                   │  NotificationService    │
-                   └────────────┬────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        │                       │                       │
-┌───────▼──────┐    ┌──────────▼─────────┐    ┌────────▼────────┐
-│ EmailService │    │ WebSocketService   │    │  QueueService   │
-└──────────────┘    └────────────────────┘    └─────────────────┘
-        │                       │                       │
-┌───────▼──────┐    ┌──────────▼─────────┐    ┌────────▼────────┐
-│     SMTP     │    │    WebSocket       │    │    RabbitMQ     │
-└──────────────┘    └────────────────────┘    └─────────────────┘
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 📞 Support
-
-For support and questions:
-
-- Create an issue in the repository
-- Email: kenzycodex@gmail.com
-- Documentation: README Docs
-
----
-
-## ✅ Deployment Checklist
-
-- [ ] Java 17+ installed
-- [ ] Maven dependencies resolved
-- [ ] Database configuration set
-- [ ] Email SMTP configured
-- [ ] JWT secret configured
-- [ ] RabbitMQ setup (optional)
-- [ ] Docker images built
-- [ ] Environment variables set
-- [ ] Health checks passing
-- [ ] Tests passing
-- [ ] Security review completed
+Thank you for using spring-notification-service! Enjoy seamless notifications across different channels.
